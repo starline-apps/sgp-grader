@@ -1,2 +1,4 @@
-# sgp-grader
-SG Grader Angular.js
+sgp-lite
+========
+
+SGP Lite

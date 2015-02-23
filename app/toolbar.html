@@ -1,0 +1,34 @@
+﻿<div style="width:96px;" layout="row" layout-align="start center">
+    <md-button class="md-raised fill-horizontal color-bg-5 color-1 s-80 m-h-10 p-h-20 h-40 bold" ng-click="prev()">Anterior</md-button>
+</div>
+<div flex layout="column" layout-align="center center">
+    <div flex layout="row" layout-align="center center" class="s-120" ng-if="currentQuestion">
+        Questão {{currentQuestion.display_number}}
+        &nbsp;:&nbsp;
+        <input type="text" size="5" style="text-align: center" ng-model="currentQuestion.score" ng-enter="next()"/>
+        &nbsp;/&nbsp;
+        {{formatFloat(questions[currentQuestion.key].value)}}
+    </div>
+</div>
+<div style="width:96px;" layout="row" layout-align="end center">
+    <md-button class="md-raised fill-horizontal color-bg-5 color-1 s-80 m-h-10 p-h-20 h-40 bold" layout="row" layout-align="center center" ng-click="next()">
+        <span ng-show="((generalInfo.questions.done==generalInfo.questions.total-1)&&currentQuestion.oldScore==null)">Finalizar</span>
+        <span ng-show="!((generalInfo.questions.done==generalInfo.questions.total-1)&&currentQuestion.oldScore==null)">Próxima</span>
+    </md-button>
+</div>
+<div layout="row" layout-align="end center" class=" m-h-30">
+    <md-button layout="row" layout-align="start center" class="md-raised fill-horizontal s-70 m-h-10 bold h-40" ng-click="showComment(true)" ng-class="{'color-bg-1 color-5':currentQuestion.comment==null,'color-bg-5 color-1':currentQuestion.comment!=null}">
+        <div layout="row" layout-align="center center">
+            <div style="width:32px" layout="row" layout-align="center center">
+                <md-icon style="margin-top:0px;" icon="images/action/ic_assignment_24px.svg" ng-show="currentQuestion.comment!=null" icon-fill="white"></md-icon>
+                <md-icon style="margin-top:0px;" icon="images/action/ic_assignment_24px.svg" ng-show="currentQuestion.comment==null" icon-fill="green"></md-icon>
+            </div>
+            <div  ng-show="currentQuestion.comment!=null">Editar comentário</div>
+            <div  ng-show="currentQuestion.comment==null">Adicionar comentário</div>
+        </div>
+
+    </md-button>
+</div>
+<div style="width:96px;" layout="row" layout-align="end center">
+    <md-button class="md-raised fill-horizontal color-bg-5 color-1 s-80 m-h-10 p-h-20 h-40 bold" ng-click="showFinish()">Fechar</md-button>
+</div>

@@ -1,0 +1,56 @@
+﻿<div class="color-bg-1 md-whiteframe-z1" layout="column"  layout-align="start center" style="width:512px;height:256px">
+    <div layout="column" flex layout-align="start center" class="color-bg-1  m-b-10 fill-horizontal">
+        <div class="fill-horizontal color-bg-5 color-1 h-40 s-100 bold" layout="row" layout-align="start center">
+            <div style="width:48px" layout="row" layout-align="center center">
+                <md-icon  style="margin-top:0px;" icon="images/action/ic_done_all_24px.svg" icon-fill="white"></md-icon>
+            </div>
+            <div flex layout="row" layout-align="start center" class="h-48 s-90">
+                Correção finalizada
+            </div>
+        </div>
+        <div flex layout="row" layout-align="center space-between" class="fill-horizontal p-16">
+            <!--
+            <div layout="row" layout-align="center center" class="fill-horizontal s-110 bold">
+                <div layout="row" layout-align="center center" class="m-h-20">
+                    <md-icon icon="images/action/ic_perm_identity_24px.svg"  icon-fill="black"></md-icon>
+                </div>
+                <div layout="row" layout-align="start center" flex>
+
+                </div>
+            </div>
+            <div layout="row" layout-align="center center" class="fill-horizontal s-110 bold">
+                <div layout="row" layout-align="center center" class="m-h-20">
+                    <md-icon icon="images/content/ic_assignment_24px.svg"  icon-fill="black"></md-icon>
+                </div>
+                <div layout="row" layout-align="start center" flex>
+                     :
+                </div>
+            </div>
+            -->
+            <div flex layout="column" class="md-whiteframe-z1">
+                <div layout="row" layout-align="center center" class="bg-blue-dark color-1 fill-horizontal h-32 s-90 bold">
+                    Alunos corrigidos
+                </div>
+                <div flex layout="column" layout-align="center center" class="s-120 bold p-5">
+                    {{generalInfo.candidates.done}}
+                </div>
+            </div>
+            <div flex layout="column" class="md-whiteframe-z1 m-l-30" >
+                <div layout="row" layout-align="center center" class="bg-blue-dark color-1 fill-horizontal h-32 s-90 bold">
+                    Questões corrigidas
+                </div>
+                <div flex layout="column" layout-align="center center" class="s-120 bold p-5">
+                    {{generalInfo.questions.done}}
+                </div>
+            </div>
+        </div>
+        <div layout="row" layout-align="center space-between" class="fill-horizontal p-16 h-64">
+            <div flex layout="row" layout-align="center center">
+                <md-button class="md-raised color-bg-3 fill-horizontal color-1 s-80 p-h-20 h-48 bold" ng-click="showFinished(false)">Permanecer na correção</md-button>
+            </div>
+            <div flex layout="row" layout-align="center center" class="m-l-30">
+                <md-button class="md-raised color-bg-5 fill-horizontal color-1 s-80 p-h-20 h-48 bold" onclick="window.close()">Fechar esta página</md-button>
+            </div>
+        </div>
+    </div>
+</div>

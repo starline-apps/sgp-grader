@@ -1,0 +1,168 @@
+<div layout="column" layout-align="start center" class="color-bg-1 md-whiteframe-z1  m-b-8 fill-horizontal" ng-if="currentCandidate">
+    <div class="fill-horizontal bg-blue-dark color-1 h-32 s-100 bold" layout="row" layout-align="center center">
+        <div flex="15" layout="row" layout-align="center center" class="h-32 pointer" ng-click="scheduleInfo.visible = !scheduleInfo.visible">
+            <md-icon icon="images/content/ic_remove_24px.svg" ng-show="scheduleInfo.visible" icon-fill="white"></md-icon>
+            <md-icon icon="images/content/ic_add_24px.svg" ng-show="!scheduleInfo.visible" icon-fill="white"></md-icon>
+        </div>
+        <div flex layout="row" layout-align="start center" class="h-32 s-90" layout-wrap ng-bind="limitString(currentCandidate.name,36)">
+        </div>
+    </div>
+    <div flex layout="row" layout-align="space-between" class="fill-horizontal p-10" ng-show="scheduleInfo.visible">
+        <div style="width:140px" layout="column" class="md-whiteframe-z1">
+            <div layout="row" layout-align="center center" class="color-bg-3 color-1 fill-horizontal h-24 s-70 bold">
+                Questões Corrigidas
+            </div>
+            <div layout="column" layout-align="center center" class="s-100 h-32 bold">
+                Discursivas
+            </div>
+            <div flex layout="column" layout-align="center center" class="s-100 bold p-5">
+                {{currentCandidate.done}}/{{scheduleInfo.questions.discursives}}
+            </div>
+        </div>
+        <div flex layout="column" class="md-whiteframe-z1 m-l-10" >
+            <div layout="row" layout-align="center center" class="color-bg-3 color-1 fill-horizontal h-24 s-70 bold">
+                Pontuação Total
+            </div>
+            <div flex layout="column" layout-align="center center" class="p-5">
+                <div layout="column" layout-align="center center" class="fill-horizontal h-24 s-100 bold">
+                    {{formatFloat(currentCandidate.score.total)}}/{{formatFloat(scheduleInfo.score.total)}}
+                </div>
+                <div flex layout="row" layout-align="center center" class="fill-horizontal">
+                    <div flex layout="column" layout-align="center center">
+                        <div class="s-70 bold">Objetivas</div>
+                        <div class="s-70 bold">{{formatFloat(currentCandidate.score.objectives)}}/{{formatFloat(scheduleInfo.score.objectives)}}</div>
+                    </div>
+                    <div flex layout="column" layout-align="center center">
+                        <div class="s-70 bold">Discursivas</div>
+                        <div class="s-70 bold">{{formatFloat(currentCandidate.score.discursives)}}/{{formatFloat(scheduleInfo.score.discursives)}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div flex layout="column" class="color-bg-1 md-whiteframe-z1 fill-horizontal">
+
+    <div class="color-1 fill-horizontal h-48" layout="row" layout-align="center center">
+
+        <div flex layout="row" layout-align="center center" class="m-l-10">
+            <md-button class="md-raised color-1 s-80 fill-horizontal bold" ng-click="changeMode('candidate')" ng-class="{'color-bg-4':mode=='candidate','color-bg-3':mode=='question'}">Por Aluno</md-button>
+        </div>
+        <div flex layout="row" layout-align="center center" class="m-h-10">
+            <md-button class="md-raised color-1 s-80 fill-horizontal bold" ng-click="changeMode('question')" ng-class="{'color-bg-3':mode=='candidate','color-bg-4':mode=='question'}">Por Questão</md-button>
+        </div>
+
+    </div>
+
+    <div flex class="scrollable" id="candidates">
+
+        <div ng-repeat="candidate in data.candidates" layout="column" id="candidate_{{$index}}">
+            <div layout="column" layout-align="center center" layout-margin ng-class="{'color-bg-1 pointer':candidate.id!=currentCandidate.id,'color-bg-2':candidate.id==currentCandidate.id}">
+                <div layout="row" layout-align="center center" ng-click="selectCandidate(candidate)" class="fill-horizontal h-36 color-5" >
+                    <div layout="row" layout-align="center center" class="h-36 s-80 bold" style="width:32px;">
+                        {{$index + 1}}
+                    </div>
+                    <div layout="row" layout-align="center center" class="h-36 s-80 bold" style="width:32px;">
+                        <md-icon ng-if="candidate.allDone" icon-fill="green" icon="images/action/ic_done_24px.svg"></md-icon>
+                    </div>
+                    <div flex layout="column" layout-align="center start" class="s-80 bold h-36">
+                        {{candidate.name}}
+                    </div>
+                    <div flex="15" layout="row" layout-align="center center" class="s-80 bold h-36">
+                        {{formatFloat(candidate.score.total)}}
+                    </div>
+                </div>
+                <div layout="row" layout-align="start center" ng-show="candidate.id==currentCandidate.id" class="fill-horizontal p-h-12 color-bg-2 color-5" layout-padding layout-margin layout-wrap>
+                    <div ng-repeat="question in candidate.questions" ng-if="questions[question.key].type=='t'" class="item-index-box color-1"  layout="row" layout-align="start center" ng-click="selectQuestion(question, candidate)">
+                        <div layout="row" layout-align="center center" class="item-index md-whiteframe-z1 pointer" ng-class="{'bg-red-dark':question.key!=currentQuestion.key && question.score===null, 'color-bg-4':question.score!==null, 'bg-blue-dark':candidate.id==currentQuestion.candidateId && question.key==currentQuestion.key}">
+                            {{question.display_number}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div layout="row" layout-align="center center" ng-if="data.candidatesAbsent.length>0" class="fill-horizontal h-24 color-1 bg-grey-dark s-80 bold" >
+            Alunos Ausentes
+        </div>
+
+
+        <div ng-repeat="candidate in data.candidatesAbsent" layout="column">
+            <div layout="column" layout-align="center center" layout-margin>
+                <div layout="row" layout-align="center center" class="fill-horizontal h-36 color-5" >
+                    <div layout="row" layout-align="center center" class="h-36 s-80 bold" style="width:32px;">
+                        {{data.candidates.length + $index +1}}
+                    </div>
+                    <div layout="row" layout-align="center center" class="h-36 s-80 bold" style="width:32px;">
+                        <md-icon icon-fill="red" icon="images/content/ic_block_24px.svg"></md-icon>
+                    </div>
+                    <div flex layout="column" layout-align="center start" class="s-80 bold h-36">
+                        {{candidate.name}}
+                    </div>
+                    <div flex="15" layout="row" layout-align="center center" class="s-80 bold h-36">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div layout="row" layout-align="center center" ng-if="data.candidatesNotProcessed.length>0" class="fill-horizontal color-1 bg-grey-dark  s-80 bold h-24" >
+            Alunos sem imagem processada
+        </div>
+
+        <div ng-repeat="candidate in data.candidatesNotProcessed" layout="column">
+            <div layout="column" layout-align="center center" layout-margin>
+                <div layout="row" layout-align="center center" class="fill-horizontal h-36 color-5" >
+                    <div layout="row" layout-align="center center" class="h-36 s-80 bold" style="width:32px;">
+                        {{data.candidatesAbsent.length + data.candidates.length + $index + 1}}
+                    </div>
+                    <div layout="row" layout-align="center center" class="h-36 s-80 bold" style="width:32px;">
+                        <md-icon icon-fill="blue" icon="images/action/ic_info_24px.svg"></md-icon>
+                    </div>
+                    <div flex layout="column" layout-align="center start" class="s-80 bold h-36">
+                        {{candidate.name}}
+                    </div>
+                    <div flex="15" layout="row" layout-align="center center" class="s-80 bold h-36">
+                        -
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div layout="column" class="color-bg-1 md-whiteframe-z1 m-t-8 fill-horizontal">
+    <div layout="row" layout-align="center center" class="bg-blue-dark color-1 fill-horizontal h-32 s-100 bold">
+        <div flex="15" layout="row" layout-align="center center" class="h-32 pointer" ng-click="generalInfo.visible = !generalInfo.visible">
+            <md-icon icon="images/content/ic_remove_24px.svg"  ng-show="generalInfo.visible" icon-fill="white"></md-icon>
+            <md-icon icon="images/content/ic_add_24px.svg"  ng-show="!generalInfo.visible" icon-fill="white"></md-icon>
+        </div>
+        <div flex layout="row" layout-align="start center" class="h-32 s-90" ng-bind="limitString('Reavaliação Presencial - 2º/2013',36)">
+        </div>
+
+    </div>
+    <div flex layout="column" layout-align="center center" class="fill-horizontal" ng-show="generalInfo.visible">
+        <div  layout="row" layout-align="center center" class="fill-horizontal h-32">
+            <div flex="60" layout="row" layout-align="start center" class="s-90 bold p-h-12">
+                Questões corrigidas
+            </div>
+            <div flex layout="row" layout-align="end center" class="s-90 bold p-h-12">
+                {{generalInfo.questions.done}}/{{generalInfo.questions.total}}
+            </div>
+        </div>
+        <div layout="row" layout-align="center center" class="fill-horizontal h-32">
+            <div flex="60" class="s-90 bold p-h-12" layout="row" layout-align="start center" >
+                Alunos corrigidos
+            </div>
+            <div flex class="s-90 bold p-h-12" layout="row" layout-align="end center" >
+                {{generalInfo.candidates.done}}/{{data.candidates.length}}
+            </div>
+        </div>
+    </div>
+</div>

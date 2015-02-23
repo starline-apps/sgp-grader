@@ -1,0 +1,177 @@
+﻿<!doctype html  ng-app="SGPGrader">
+<!--[if lt IE 7]>      <html ng-app="SGPGrader" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html ng-app="SGPGrader" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html  ng-app="SGPGrader" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html  ng-app="SGPGrader" class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-language" content="pt-br" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="Gerenciamento de atletas" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="author" content="Starline Tecnologia" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0">
+    <title>SGP Grader</title>
+
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Lato&#038;ver=3.9.1' type='text/css' media='all' />
+
+    <!-- build:css styles/vendor.css -->
+    <link rel="stylesheet" href="bower_components/angular-material/angular-material.css">
+    <!-- endbuild -->
+
+    <!-- build:css({.tmp,app}) styles/application.css -->
+    <link rel="stylesheet" href="styles/style.css" media="all" type="text/css" >
+    <link rel="stylesheet" href="styles/colors.css" media="all" type="text/css" >
+    <!-- endbuild -->
+
+    <script type="text/javascript">
+        var SGP_GRADE_URLS = {
+            base_template_url: "{{ STATIC_URL}}sgp_grade/",
+            candidates_api_url: "{% url 'candidatesonschedule_list_endpoint' schid=schedule client_slug=request.tenant.slug %}",
+            nao_encotrada_url: "{{ STATIC_URL}}sgp_grade/images/nao_encotrada.jpg",
+            nao_associada_url: "{{ STATIC_URL}}sgp_grade/images/nao_associada.jpg",
+            xap_url: "{% url 'corretoronlinexap' client_slug=request.tenant.slug %}",
+            base_url: "{{current_site}}"
+        };
+    </script>
+
+</head>
+
+<body ng-controller="GraderController" layout="column"  layout-align="start center" class="color-bg-2 fill" ng-init="started=false;mode='candidate';">
+
+<!--
+{% verbatim %}
+-->
+
+<div id="container" layout="column" layout-align="start center" class="color-bg-2 fill-vertical" style="width:1280px;display:none">
+
+    <div id="content" layout="row" flex class="fill-horizontal">
+
+        <div style="width:340px" layout="column" ng-include src="'sidebar.html'" class="m-v-8 m-l-8">
+        </div>
+
+        <div flex layout="column" layout-align="center center" class="m-v-8 m-h-8">
+            <div ng-include src="'toolbar.html'" layout="row" layout-align="center center" ng-show="currentQuestion" class="h-64 color-bg-1 md-whiteframe-z1 fill-horizontal">
+            </div>
+
+            <div layout="row" layout-align="center center" ng-show="!started && !currentQuestion" class="md-whiteframe-z1 fill-horizontal s-130 color-bg-5 color-1 h-64">
+                <div layout="row" layout-align="start center" flex="90">
+                    Bem vindo ao corretor de provas.
+                </div>
+            </div>
+
+            <div layout="column" layout-align="center center" flex class="color-bg-1 md-whiteframe-z1 fill-horizontal m-t-8 relative">
+                <div id="prev-page" class="page-navigation" style="display:none">
+                    <md-button layout="row" layout-align="start center" aria-label="Anterior" class="md-raised md-fab color-bg-5" ng-click="selectPage(currentPage.index-1)">
+                        <md-icon icon="images/navigation/ic_arrow_back_24px.svg" icon-fill="white"></md-icon>
+                    </md-button>
+                </div>
+                <div id='silverlight' style="display:none;" layout="column" layout-align="center center" style="width:0;height:0" class="fill-horizontal" ng-include src="'silverlight.html'">
+                </div>
+                <div id="next-page" class="page-navigation" style="display:none">
+                    <md-button layout="row" layout-align="start center" aria-label="Próxima"  class="md-raised md-fab color-bg-5" ng-click="selectPage(currentPage.index+1)">
+                        <md-icon icon="images/navigation/ic_arrow_forward_24px.svg" icon-fill="white"></md-icon>
+                    </md-button>
+                </div>
+                <div ng-show="!currentQuestion && started" layout="column" layout-align="center center" flex class="fill-horizontal s-150 bold">
+                    <img src="images/aguarde.gif" />
+                </div>
+                <div ng-show="!started" layout="column" layout-align="center center" flex class="fill-horizontal">
+                    <div layout="row" layout-align="center center" class="fill-horizontal s-130 h-100">
+                        <div layout="row" layout-align="start center" flex="90">
+                            Clique abaixo ou selecione um dos alunos ao lado para começar a corrigir.
+                        </div>
+                    </div>
+                    <div layout="column" layout-align="start center" flex class="fill-horizontal">
+                        <div layout="column" layout-align="center center" flex="50" class="fill-horizontal">
+                            <md-button class="md-raised color-bg-5 color-1 s-80 m-h-10 p-h-20 h-48 bold" ng-click="start()">Começar</md-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="overlay-transparent" style="display:none;" layout="column"  layout-align="center center">
+   &nbsp;
+</div>
+
+<div id="overlay" style="display:none;" layout="column"  layout-align="center center">
+    <div>&nbsp;</div>
+</div>
+
+<div id="loading" style="display:none;" class="dialog" layout="column"  layout-align="center center">
+    <div class="color-bg-1 md-whiteframe-z1" layout="column"  layout-align="center center" style="width:25%;height:25%;">
+        <div layout="column"  layout-align="center center" >
+            <img src="images/aguarde.gif" />
+        </div>
+    </div>
+</div>
+
+<div ng-include src="'comment.html'" id="comment" style="display:none" class="dialog" layout="column"  layout-align="center center">
+
+</div>
+
+<div ng-include src="'error.html'" id="error" style="display:none" class="dialog" layout="column"  layout-align="center center">
+
+</div>
+
+<div ng-include src="'unavailable-server.html'" id="unavailable-server" style="display:none" class="dialog" layout="column"  layout-align="center center">
+
+</div>
+
+<div ng-include src="'install-silverlight.html'" id="install-silverlight" style="display:none" class="dialog" layout="column"  layout-align="center center">
+
+</div>
+
+<div ng-include src="'finished.html'" id="finished" style="display:none" class="dialog" layout="column"  layout-align="center center">
+
+</div>
+
+<!--
+{% endverbatim %}
+-->
+
+<!-- build:js scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/angular-aria/angular-aria.js"></script>
+<script src="bower_components/hammerjs/hammer.js"></script>
+<script src="bower_components/angular-material/angular-material.js"></script>
+<script src="bower_components/angular-django-rest-resource/angular-django-rest-resource.js"></script>
+<!-- endbower -->
+<!-- endbuild -->
+
+
+<!--[if lt IE 9]>
+<script src="bower_components/es5-shim/es5-shim.js"></script>
+<script src="bower_components/json3/lib/json3.min.js"></script>
+<![endif]-->
+
+<!-- build:js({.tmp,app}) scripts/scripts.js -->
+<script src="scripts/app.js"></script>
+<script src="scripts/util.js"></script>
+<script src="scripts/graderController.js"></script>
+<script src="scripts/graderService.js"></script>
+<script src="scripts/gateway.js"></script>
+<script src="scripts/silverlight.js"></script>
+<!-- endbuild -->
+
+<!--
+<form>
+  % csrf_token %}
+
+
+</form>
+-->
+
+</body>
+</html>
